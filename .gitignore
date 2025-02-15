@@ -1,3 +1,20 @@
 back/node_modules
 back/.env
 back/MongoDB
+
+# Dependencies
+front/node_modules/
+front/dist/
+front/.temp/
+front/.cache/
+
+# Environnement variables
+front/.env
+front/.env.local
+front/.env.development
+front/.env.production
+# Éditeurs et IDE
+front/.vscode/
+
+
+
