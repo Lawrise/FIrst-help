@@ -31,90 +31,35 @@ interface Call {
   dateTime: string;
 }
 
-const recentCallsData: Call[] = [
-  {
-    id: 1,
-    checked: false,
-    name: "Boisne Jembe",
-    priority: "vital",
-    description: "Loss of consciousness and don't breathe",
-    dateTime: "15/02/2025 - 18h30",
-  },
-  {
-    id: 2,
-    checked: true,
-    name: "Alice Dupont",
-    priority: "high",
-    description: "Severe chest pain and difficulty breathing",
-    dateTime: "16/02/2025 - 09h15",
-  },
-  {
-    id: 3,
-    checked: false,
-    name: "Jean Martin",
-    priority: "medium",
-    description: "High fever and persistent cough",
-    dateTime: "17/02/2025 - 14h45",
-  },
-  {
-    id: 4,
-    checked: true,
-    name: "Sophie Leroy",
-    priority: "low",
-    description: "Mild headache and dizziness",
-    dateTime: "18/02/2025 - 11h00",
-  },
-  {
-    id: 5,
-    checked: false,
-    name: "Pierre Garnier",
-    priority: "vital",
-    description: "Severe allergic reaction with swelling",
-    dateTime: "19/02/2025 - 20h00",
-  },
-];
-
 function App() {
   const { calls, loading, error, addCall } = useCallstStore();
 
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   useEffect(() => {
-      const socket = new WebSocket('ws://localhost:3001');
+    const socket = new WebSocket(`ws://${window.location.hostname}:3000`);
 
-      socket.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        
-        if (message.type === 'initial') {
-          // Mettre à jour le store avec message.calls
-          useCallstStore.setState({ calls: message.calls });
-        } else if (message.type === 'update') {
-          addCall(message.data);
-        }
-      };
+    socket.onmessage = (event) => {
+      const message = JSON.parse(event.data);
 
-      socket.onopen = () => {
-        console.log("WebSocket connection established");
-      };
-      
+      if (message.type === "initial") {
+        addCall({ call: message.data });
+      } else if (message.type === "update") {
+        addCall(message.data);
+      }
+    };
 
-      socket.onerror = (error) => {
-        console.error('Erreur WebSocket:', error);
-      };
+    socket.onopen = () => {
+      console.log("Connected to WebSocket");
+    };
 
-
-      socket.onclose = () => {
-          console.log('Connexion WebSocket fermée');
-          // setTimeout(() => {
-          //     console.log('Reconnexion...');
-          //     window.location.reload();
-          // }, 3000);
-      };
-
-      return () => {
-        if (socket.readyState === WebSocket.OPEN) {
-          socket.close();
-        }
-      };
+    return () => socket.close();
   }, []);
 
   if (loading) return <p>Loading...</p>;
@@ -154,9 +99,9 @@ function App() {
                     </TableCell>
                     <TableCell>{call.accident}</TableCell>
                     <TableCell>{call.location}</TableCell>
-                    {/* <TableCell className="text-right">
-                      {call.dateTime}
-                    </TableCell> */}
+                    <TableCell className="text-right">
+                      {formatTime(call.dateTime)}
+                    </TableCell>
                   </TableRow>
                 </DialogTrigger>
 

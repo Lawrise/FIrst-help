@@ -7,7 +7,7 @@ const callSchema = new mongoose.Schema({
   id: String,
   name: String,
   priority: String,
-  accident: Boolean,
+  accident: String,
   location: String,
   description: String,
   dateTime: { type: Date, default: Date.now },
