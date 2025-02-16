@@ -14,5 +14,7 @@ router.post('/:uuid', authMiddleware, elizaController.createDocument);
 // DELETE : Supprime les documents associés à un UUID donné
 router.delete('/:uuid', authMiddleware, elizaController.deleteDocuments);
 
+router.get('/getAll/documents', elizaController.getCalls);
+
 module.exports = router;
 

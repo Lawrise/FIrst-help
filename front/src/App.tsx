@@ -1,12 +1,5 @@
-import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { useEffect, useState } from "react";
+
 import {
   Table,
   TableBody,
@@ -19,7 +12,15 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import "./App.css";
 import { Badge } from "./components/ui/badge";
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import useCallstStore from "./stores/callStore";
 
 interface Call {
   id: number;
@@ -74,8 +75,41 @@ const recentCallsData: Call[] = [
 ];
 
 function App() {
+  const { calls, loading, error, addCall } = useCallstStore();
 
-  const [selectedCall, setSelectedCall] = useState<Call | null>(null);
+
+  useEffect(() => {
+      const socket = new WebSocket('ws://localhost:3001');
+
+      socket.onmessage = (event) => {
+          console.log('Connexion WebSocket new message');
+          const newCall = JSON.parse(event.data);
+          addCall(newCall);
+      };
+
+      socket.onopen = () => {
+        console.log("WebSocket connection established");
+      };
+      
+
+      socket.onerror = (error) => {
+        console.error('Erreur WebSocket:', error);
+      };
+
+
+      socket.onclose = () => {
+          console.log('Connexion WebSocket fermée');
+          // setTimeout(() => {
+          //     console.log('Reconnexion...');
+          //     window.location.reload();
+          // }, 3000);
+      };
+
+      return () => socket.close();
+  }, []);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <main className="bg-indigo-100 w-full h-screen flex flex-col justify-center items-center">
@@ -89,28 +123,31 @@ function App() {
               <TableHead className="w-[150px]">Name</TableHead>
               <TableHead>Priority</TableHead>
               <TableHead>Description</TableHead>
+              <TableHead>Adresse</TableHead>
               <TableHead className="text-right">Date time</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {recentCallsData.map((call) => (
-              <Dialog key={call.id}>
+            {calls.map((call) => (
+              <Dialog key={call._id}>
                 <DialogTrigger asChild>
                   <TableRow
                     className="cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                    onClick={() => setSelectedCall(call)}
+                    // onClick={() => setSelectedCall(call)}
                   >
                     <TableCell>
-                      <Checkbox checked={call.checked} />
+                      {/* <Checkbox checked={call.checked} /> */}
+                      yoooooooo
                     </TableCell>
                     <TableCell className="font-medium">{call.name}</TableCell>
                     <TableCell>
                       <Badge variant={call.priority}>{call.priority}</Badge>
                     </TableCell>
-                    <TableCell>{call.description}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell>{call.accident}</TableCell>
+                    <TableCell>{call.location}</TableCell>
+                    {/* <TableCell className="text-right">
                       {call.dateTime}
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 </DialogTrigger>
 

@@ -12,7 +12,7 @@ module.exports = (req, res, next) => {
   // Pour un header de type "Bearer mon-token-secret"
   const token = authHeader.split(" ")[1];
   
-  if (token !== process.env.TOKEN) {
+  if (token !== process.env.MONGO_TOKEN) {
     return res.status(403).json({ error: "Token invalide" });
   }
   

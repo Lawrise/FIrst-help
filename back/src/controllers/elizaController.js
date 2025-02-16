@@ -43,6 +43,7 @@ exports.createDocument = async (req, res) => {
     const collection = getCollection();
 
     // Ajoute l'UUID dans le document à insérer
+    console.log(data);
     const document = { uuid: userUuid, ...data };
 
     const result = await collection.insertOne(document);
@@ -68,6 +69,34 @@ exports.deleteDocuments = async (req, res) => {
   } catch (error) {
     console.error("Erreur lors de la suppression des documents :", error);
     return res.status(500).json({ error: "Erreur lors de la suppression des documents" });
+  }
+};
+
+exports.getAllDocument = async (req, res) => {
+  try {
+    const collection = getCollection();
+    
+    // Récupère tous les documents, triés par date de création décroissante
+    const allDocuments = await collection.find({})
+
+    if (allDocuments.length === 0) {
+      return res.status(404).json({ message: "Aucun document trouvé dans la base de données" });
+    }
+
+    return res.json(allDocuments);
+  } catch (error) {
+    console.error("Erreur lors de la récupération de tous les documents :", error);
+    return res.status(500).json({ error: "Erreur lors de la récupération des données" });
+  }
+};
+
+exports.getCalls = async (req, res) => {
+  try {
+    const calls = await Call.find().sort({ dateTime: -1 }).limit(10);
+    res.json(calls);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error retrieving calls' });
   }
 };
 
