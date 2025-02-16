@@ -92,7 +92,7 @@ exports.getAllDocument = async (req, res) => {
 
 exports.getCalls = async (req, res) => {
   try {
-    const calls = await Call.find().sort({ dateTime: -1 }).limit(10);
+    const calls = await Call.find();
     res.json(calls);
   } catch (err) {
     console.error(err);

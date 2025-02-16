@@ -1,14 +1,12 @@
-// src/config/db.js
-const { MongoClient } = require('mongodb');
+const mongoose = require('mongoose');
 require('dotenv').config();
-
-let db;
 
 async function connectToDatabase() {
   try {
-    const client = new MongoClient(process.env.DATABASE_URL, { useUnifiedTopology: true });
-    await client.connect();
-    db = client.db(); // Utilise la valeur de database figurant dans DATABASE_URL
+    await mongoose.connect(process.env.DATABASE_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
     console.log('Connexion à MongoDB réussie.');
   } catch (error) {
     console.error('Erreur de connexion à MongoDB :', error);
@@ -16,12 +14,4 @@ async function connectToDatabase() {
   }
 }
 
-function getCollection() {
-  if (!db) {
-    throw new Error('Base de données non initialisée');
-  }
-  return db.collection('eliza'); // Nom de la collection
-}
-
-module.exports = { connectToDatabase, getCollection };
-
+module.exports = { connectToDatabase };

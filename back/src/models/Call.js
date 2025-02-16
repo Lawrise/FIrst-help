@@ -1,12 +1,16 @@
-const mongoose = require('mongoose');
+// src/models/Call.js
+const mongoose = require("mongoose");
+const { idleTimeoutMillis } = require("pg/lib/defaults");
 
 const callSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    priority: { type: String, required: true },
-    accident: { type: String, required: true },
-    location: { type: String, required: true },
-    description: { type: String }, // Optionnel
-    dateTime: { type: Date, default: Date.now }, // Optionnel
+  uuid: String,
+  id: String,
+  name: String,
+  priority: String,
+  accident: Boolean,
+  location: String,
+  description: String,
+  dateTime: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model('Call', callSchema);
+module.exports = mongoose.model("Call", callSchema);

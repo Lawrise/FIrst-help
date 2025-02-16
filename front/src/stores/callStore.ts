@@ -5,6 +5,7 @@ import axios from "axios";
 export type Priority = "1" | "2" | "3" | "4";
 
 interface Call {
+  id: string;
   _id: string;
   uuid: string;
   name: string;

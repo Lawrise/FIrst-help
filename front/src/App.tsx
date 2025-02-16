@@ -23,11 +23,11 @@ import {
 import useCallstStore from "./stores/callStore";
 
 interface Call {
-  id: number;
+  _id: string;
   checked: boolean;
   name: string;
   priority: "low" | "medium" | "high" | "vital";
-  description: string;
+  accident: string;
   dateTime: string;
 }
 
@@ -82,9 +82,14 @@ function App() {
       const socket = new WebSocket('ws://localhost:3001');
 
       socket.onmessage = (event) => {
-          console.log('Connexion WebSocket new message');
-          const newCall = JSON.parse(event.data);
-          addCall(newCall);
+        const message = JSON.parse(event.data);
+        
+        if (message.type === 'initial') {
+          // Mettre à jour le store avec message.calls
+          useCallstStore.setState({ calls: message.calls });
+        } else if (message.type === 'update') {
+          addCall(message.data);
+        }
       };
 
       socket.onopen = () => {
@@ -105,7 +110,11 @@ function App() {
           // }, 3000);
       };
 
-      return () => socket.close();
+      return () => {
+        if (socket.readyState === WebSocket.OPEN) {
+          socket.close();
+        }
+      };
   }, []);
 
   if (loading) return <p>Loading...</p>;
@@ -129,7 +138,7 @@ function App() {
           </TableHeader>
           <TableBody>
             {calls.map((call) => (
-              <Dialog key={call._id}>
+              <Dialog key={call._id || call.id}>
                 <DialogTrigger asChild>
                   <TableRow
                     className="cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800"
@@ -169,7 +178,7 @@ function App() {
                     </div>
                     <div>
                       <span className="font-semibold">Description:</span>{" "}
-                      {call.description}
+                      {call.accident}
                     </div>
                     <div>
                       <span className="font-semibold">Date and Time:</span>{" "}
